@@ -13,6 +13,8 @@ jobs:
   validate:
     name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
     strategy:
       fail-fast: false
       matrix:
