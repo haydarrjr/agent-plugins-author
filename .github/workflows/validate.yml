@@ -1,0 +1,48 @@
+name: Validate Agent Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run tests
+        run: python -B -m pytest -q tests
+
+      - name: Validate portable package
+        run: python skills/agent-plugins-authoring/scripts/validate_agent_plugin.py . --format json
+
+      - name: Reconcile Codex adapter
+        run: python skills/agent-plugins-authoring/scripts/reconcile_manifests.py . --skip-native-validator --format json
+
+      - name: Validate upstream baseline offline
+        run: python skills/agent-plugins-authoring/scripts/refresh_upstream.py --offline --format json --output "$RUNNER_TEMP/upstream-report.json"
+
+      - name: Verify no generated cache is tracked
+        shell: bash
+        run: |
+          if find . -type d -name __pycache__ -o -type f \( -name '*.pyc' -o -name '*.pyo' \) | grep -q .; then
+            echo "Generated Python cache detected"
+            exit 1
+          fi

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Plugins Authoring"
+  short_description: "Create and validate portable Agent Plugins"
+  default_prompt: "Author an Agent Plugin with portable and Codex-compatible contracts."
