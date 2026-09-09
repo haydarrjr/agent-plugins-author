@@ -17,6 +17,8 @@ It is designed for authors who need a clean boundary between:
 - `plugin.json` — portable Agent Plugins 1.0.0 manifest.
 - `.codex-plugin/plugin.json` — Codex compatibility adapter scaffolded in the
   `plugin-creator` style.
+- `assets/icon.svg` — original Aether Scribe mythic guardian mark used by the
+  Codex install surfaces.
 - `skills/agent-plugins-authoring/` — the authoring workflow and its references.
 - `scripts/` — deterministic refresh, adoption, validation, reconciliation, and
   report helpers inside the skill package.

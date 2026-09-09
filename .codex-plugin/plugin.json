@@ -1,6 +1,6 @@
 {
   "name": "agent-plugins-author",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create, validate, refresh, and maintain portable Agent Plugins with a Codex adapter.",
   "author": {
     "name": "Önder Türkan",
@@ -15,6 +15,10 @@
     "category": "Productivity",
     "capabilities": [],
     "defaultPrompt": "Create or audit an Agent Plugin with portable and Codex-compatible contracts.",
+    "brandColor": "#111B4A",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
     "websiteURL": "https://github.com/haydarrjr/agent-plugins-author",
     "privacyPolicyURL": "https://github.com/haydarrjr/agent-plugins-author/blob/main/PRIVACY.md",
     "termsOfServiceURL": "https://github.com/haydarrjr/agent-plugins-author/blob/main/TERMS.md"

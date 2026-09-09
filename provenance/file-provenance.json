@@ -1,0 +1,11 @@
+{
+  "schema_version": "file-provenance.v1",
+  "files": {
+    "assets/icon.svg": {
+      "origin": "original-authored",
+      "classification": "ORIGINAL",
+      "sha256": "be8b078607e316b16284bfcd8c7e533789b18987bb149e6d2735143cd9fb2f8a",
+      "notes": "Hand-authored self-contained SVG; no external image, font, script, or copied artwork dependency."
+    }
+  }
+}

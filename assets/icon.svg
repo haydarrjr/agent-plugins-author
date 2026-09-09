@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Plugins Author — Aether Scribe sigil</title>
+  <desc id="desc">A mythic guardian seal with a star-eye, quill crest, and orbiting runes.</desc>
+  <defs>
+    <linearGradient id="bg" x1="24" y1="16" x2="230" y2="242" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#080D2B"/>
+      <stop offset="0.52" stop-color="#171246"/>
+      <stop offset="1" stop-color="#0B2B4A"/>
+    </linearGradient>
+    <linearGradient id="crest" x1="91" y1="36" x2="171" y2="208" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE29A"/>
+      <stop offset="0.43" stop-color="#D9A94F"/>
+      <stop offset="1" stop-color="#7B3F75"/>
+    </linearGradient>
+    <linearGradient id="face" x1="91" y1="69" x2="167" y2="205" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#293A82"/>
+      <stop offset="0.52" stop-color="#17265F"/>
+      <stop offset="1" stop-color="#0C183E"/>
+    </linearGradient>
+    <linearGradient id="aether" x1="107" y1="91" x2="150" y2="202" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B8FFFF"/>
+      <stop offset="0.45" stop-color="#52E2E0"/>
+      <stop offset="1" stop-color="#5C8AFF"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 115) rotate(90) scale(108)">
+      <stop stop-color="#65E8E4" stop-opacity="0.22"/>
+      <stop offset="0.64" stop-color="#4F5BDE" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#080D2B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="8" y="8" width="240" height="240" rx="54" fill="url(#bg)" stroke="#34458A" stroke-width="4"/>
+  <circle cx="128" cy="128" r="99" fill="url(#halo)"/>
+
+  <!-- The broken orbit is an authoring portal: open at the four runic gates. -->
+  <path d="M72 42C49 58 32 83 29 112M184 42C207 58 224 83 227 112M29 144C33 175 50 199 73 214M227 144C223 175 206 199 183 214" stroke="#D9A94F" stroke-width="4" stroke-linecap="round" opacity="0.88"/>
+  <path d="M91 31C103 26 115 24 128 24C141 24 153 26 165 31M91 225C103 230 115 232 128 232C141 232 153 230 165 225" stroke="#5CE4E1" stroke-width="2" stroke-linecap="round" opacity="0.72"/>
+
+  <!-- Four original rune-gates keep the emblem legible at small sizes. -->
+  <g stroke="#F5D17B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M52 91l8-8 8 8-8 8-8-8ZM56 91h8M60 87v8"/>
+    <path d="M204 91l-8-8-8 8 8 8 8-8ZM200 91h-8M196 87v8"/>
+    <path d="M52 165l8 8 8-8-8-8-8 8ZM56 165h8M60 161v8"/>
+    <path d="M204 165l-8 8-8-8 8-8 8 8ZM200 165h-8M196 161v8"/>
+  </g>
+
+  <!-- Twin horns and the quill-crown of the Aether Scribe. -->
+  <path d="M103 91C91 78 86 58 91 37C105 47 114 61 116 77L128 62L140 77C142 61 151 47 165 37C170 58 165 78 153 91C144 84 136 80 128 79C120 80 112 84 103 91Z" fill="url(#crest)" stroke="#F5D17B" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M128 28L140 50L128 68L116 50L128 28Z" fill="url(#aether)" stroke="#F5D17B" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Guardian mask. -->
+  <path d="M128 62C104 62 84 79 74 103C87 100 99 104 111 115C118 122 123 130 128 139C133 130 138 122 145 115C157 104 169 100 182 103C172 79 152 62 128 62Z" fill="url(#face)" stroke="#F5D17B" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M94 116C104 104 116 98 128 98C140 98 152 104 162 116C152 128 140 134 128 134C116 134 104 128 94 116Z" fill="#FFF1C4" stroke="#F5D17B" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M128 103C134 107 138 111 138 116C138 124 134 129 128 132C122 129 118 124 118 116C118 111 122 107 128 103Z" fill="#0A1640" stroke="#52E2E0" stroke-width="3"/>
+  <path d="M128 108V125M120 116H136" stroke="#B8FFFF" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Cloak, seal, and a single downward quill stroke. -->
+  <path d="M92 139C104 146 116 147 128 136C140 147 152 146 164 139C158 166 143 190 128 207C113 190 98 166 92 139Z" fill="url(#face)" stroke="#52E2E0" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M128 203C122 184 122 157 128 129C134 157 134 184 128 203Z" fill="url(#aether)" opacity="0.88"/>
+  <path d="M128 197V132M128 171L114 161M128 157L142 147" stroke="#F5D17B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M105 180C112 188 120 196 128 204C136 196 144 188 151 180" stroke="#F5D17B" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+
+  <g fill="#F5D17B">
+    <circle cx="128" cy="24" r="3"/>
+    <circle cx="128" cy="232" r="3"/>
+  </g>
+  <g fill="#52E2E0">
+    <circle cx="30" cy="128" r="3"/>
+    <circle cx="226" cy="128" r="3"/>
+  </g>
+</svg>

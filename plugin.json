@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "agent-plugins-author",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Create, validate, refresh, and maintain portable Agent Plugins with a Codex adapter.",
   "author": {
     "name": "Önder Türkan",

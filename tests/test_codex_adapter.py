@@ -63,4 +63,5 @@ def test_plugin_creator_cachebuster_keeps_a_single_suffix(tmp_path):
     )
     assert first.returncode == 0, first.stdout + first.stderr
     assert second.returncode == 0, second.stdout + second.stderr
-    assert json.loads((package / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))["version"] == "0.1.0+codex.second"
+    base_version = json.loads(ADAPTER.read_text(encoding="utf-8"))["version"]
+    assert json.loads((package / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8"))["version"] == f"{base_version}+codex.second"
