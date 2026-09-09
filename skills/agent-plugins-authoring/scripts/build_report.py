@@ -13,10 +13,7 @@ from reconcile_manifests import reconcile
 from refresh_upstream import local_report, online_report
 
 
-def marketplace_status(plugin_name: str) -> dict:
-    path = Path.home() / ".agents" / "plugins" / "marketplace.json"
-    if not path.is_file():
-        return {"status": "NOT_RUN", "checks": [], "path": str(path)}
+def _marketplace_entry_status(plugin_name: str, path: Path, repo_root: Path | None) -> dict:
     try:
         marketplace = strict_json_load(path)
     except (OSError, ValueError) as exc:
@@ -26,10 +23,50 @@ def marketplace_status(plugin_name: str) -> dict:
         return {"status": "FAIL", "checks": ["expected exactly one marketplace entry"], "path": str(path)}
     entry = entries[0]
     source = entry.get("source", {})
-    expected = f"./plugins/{plugin_name}"
-    if source.get("source") != "local" or source.get("path") != expected:
-        return {"status": "FAIL", "checks": ["marketplace source path mismatch"], "path": str(path)}
-    return {"status": "PASS", "checks": ["local personal marketplace entry matches"], "path": str(path)}
+    if repo_root is None:
+        expected = f"./plugins/{plugin_name}"
+        if source.get("source") != "local" or source.get("path") != expected:
+            return {"status": "FAIL", "checks": ["marketplace source path mismatch"], "path": str(path)}
+        return {"status": "PASS", "checks": ["local personal marketplace entry matches"], "path": str(path), "surface": "personal"}
+
+    if source.get("source") == "url":
+        url = source.get("url", "")
+        if not isinstance(url, str) or not url.startswith("https://"):
+            return {"status": "FAIL", "checks": ["repo marketplace URL source must be HTTPS"], "path": str(path)}
+        return {"status": "PASS", "checks": ["Git-backed repo marketplace entry matches"], "path": str(path), "surface": "repo"}
+
+    if source.get("source") == "git-subdir":
+        url = source.get("url", "")
+        subdir = source.get("path", "")
+        if not isinstance(url, str) or not url.startswith("https://") or not isinstance(subdir, str) or not subdir.startswith("./"):
+            return {"status": "FAIL", "checks": ["repo marketplace git-subdir entry is invalid"], "path": str(path)}
+        return {"status": "PASS", "checks": ["Git-backed subdirectory marketplace entry matches"], "path": str(path), "surface": "repo"}
+
+    if source.get("source") == "local":
+        relative = source.get("path")
+        if not isinstance(relative, str) or not relative.startswith("./"):
+            return {"status": "FAIL", "checks": ["repo marketplace local path must start with ./"], "path": str(path)}
+        candidate = (path.parent.parent.parent / relative).resolve()
+        root = repo_root.resolve()
+        try:
+            candidate.relative_to(root)
+        except ValueError:
+            return {"status": "FAIL", "checks": ["repo marketplace local path escapes repository root"], "path": str(path)}
+        return {"status": "PASS", "checks": ["local repo marketplace entry matches"], "path": str(path), "surface": "repo"}
+
+    return {"status": "FAIL", "checks": ["unsupported marketplace source"], "path": str(path)}
+
+
+def marketplace_status(plugin_name: str, root: Path) -> dict:
+    repo_path = root / ".agents" / "plugins" / "marketplace.json"
+    if repo_path.is_file():
+        return _marketplace_entry_status(plugin_name, repo_path, root)
+
+    personal_path = Path.home() / ".agents" / "plugins" / "marketplace.json"
+    if personal_path.is_file():
+        return _marketplace_entry_status(plugin_name, personal_path, None)
+
+    return {"status": "NOT_RUN", "checks": [], "path": str(repo_path), "surface": "repo"}
 
 
 def build(root: Path, online: bool = False) -> dict:
@@ -46,7 +83,12 @@ def build(root: Path, online: bool = False) -> dict:
     else:
         upstream = {"status": "NOT_RUN", "diff": ["upstream lock is missing"]}
 
-    marketplace = marketplace_status(str(portable.get("name", root.name)))
+    try:
+        portable_manifest = strict_json_load(root / "plugin.json")
+    except (OSError, ValueError):
+        portable_manifest = {}
+    plugin_name = str(portable_manifest.get("name", root.resolve().name))
+    marketplace = marketplace_status(plugin_name, root)
     required_pass = portable["status"] == "PASS" and adapter["status"] == "PASS"
     if not required_pass:
         status = "FAIL"
