@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0
+
+- Add Astra-aware skill design linting and trigger-routing fixtures.
+- Add deterministic Codex IDE skill materialization and surface reconciliation.
+- Separate v2 evidence for portable, Codex plugin, IDE, marketplace, MCP host,
+  installation, host readback, and live status.
+- Add development/release marketplace rendering and deterministic package build.
+- Remove machine-specific host paths and keep optional MCP configuration
+  credential-free.
+
 ## 0.1.1 — 2026-09-09
 
 - Added the original Aether Scribe mythic guardian icon as a self-contained SVG.

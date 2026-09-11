@@ -1,33 +1,25 @@
 # Agent Plugins Author
 
-Agent Plugins Author is a skills-only plugin for creating, auditing, porting,
-refreshing, and packaging portable Agent Plugins with a Codex compatibility
-adapter.
+Agent Plugins Author is a skills-only plugin for creating, auditing, updating,
+and packaging portable Agent Plugins with separate Codex plugin and Codex IDE
+skill surfaces.
 
-It is designed for authors who need a clean boundary between:
+## Source and distribution surfaces
 
-- the portable Agent Plugins contract;
-- the Codex-native `.codex-plugin/plugin.json` adapter;
-- upstream published and working-draft specifications;
-- provenance, security, and deterministic validation; and
-- marketplace configuration, installation, and host read-back evidence.
+- `plugin.json` — portable Agent Plugins 1.0.0 manifest and authority.
+- `.codex-plugin/plugin.json` — Codex plugin adapter.
+- `skills/agent-plugins-authoring/` — canonical authoring skill, references,
+  and deterministic helpers.
+- `.agents/skills/` — generated Codex IDE standalone-skill adapter; never edit
+  this surface by hand.
+- `.agents/plugins/marketplace.json` — repo-scoped GitHub marketplace catalog.
+- `provenance/` — upstream and adapter identity records.
+- `tests/` — contract, security, design, routing, parity, and determinism tests.
 
-## What is included
-
-- `plugin.json` — portable Agent Plugins 1.0.0 manifest.
-- `.codex-plugin/plugin.json` — Codex compatibility adapter scaffolded in the
-  `plugin-creator` style.
-- `assets/icon.svg` — original Aether Scribe mythic guardian mark used by the
-  Codex install surfaces.
-- `skills/agent-plugins-authoring/` — the authoring workflow and its references.
-- `scripts/` — deterministic refresh, adoption, validation, reconciliation, and
-  report helpers inside the skill package.
-- `.agents/plugins/marketplace.json` — a repo marketplace catalog that loads the
-  plugin from this public GitHub repository root.
-- `tests/` — contract, security, provenance, determinism, and pressure tests.
-
-The v1 package is skills-only. It intentionally does not bundle an MCP server,
-credentials, hooks, or client-specific connection files.
+The portable package remains skills-only. It does not bundle an MCP server,
+credentials, hooks, or client-specific connection files. If a future package
+explicitly adds portable `mcp.json`, the host adapter may render a
+credential-free `.codex/config.toml.example`.
 
 ## Install from GitHub
 
@@ -39,24 +31,28 @@ codex plugin marketplace list
 ```
 
 Then refresh the Plugins Directory in the ChatGPT desktop app, select **Agent
-Plugins Author**, install it, and test it in a new conversation. For a
-reproducible review, pin the marketplace source to an exact Git ref or commit
-instead of `main`.
+Plugins Author**, install it, and test it in a new conversation. Codex CLI can
+also browse configured marketplaces. The Codex IDE extension does not install
+plugins; use the generated `.agents/skills/` surface there.
 
-The repository catalog uses a Git-backed root entry, so the package can remain
-at the repository root while the catalog stays at the documented
-`.agents/plugins/marketplace.json` location.
+For a reproducible release, render the repo catalog with an immutable tag or
+commit instead of the moving `main` development ref:
+
+```text
+python skills/agent-plugins-authoring/scripts/render_marketplace.py . --mode release --ref <tag-or-commit>
+```
 
 ## Authoring policy
 
-The default production target is the published Agent Plugins 1.0.0 contract.
-Agent Plugins 1.1.0 is observed as a working-draft probe only. A refresh is
-read-only and reports changes; adopting a new upstream baseline is explicit and
-preserves the last known-good snapshot on failure.
+The published Agent Plugins 1.0.0 contract is the production target. Agent
+Plugins 1.1.0 is observed as a working-draft probe only. Refresh is read-only
+and reports a diff; adopting a new upstream baseline is explicit and preserves
+the last-known-good snapshot on failure.
 
-The skill never treats validation as proof of installation, host read-back,
-publication, or live runtime state. Those are separate gates with separate
-evidence.
+Descriptions are concise and narrowly triggered. The root skill is a small
+router; detailed contracts are conditionally disclosed through references and
+deterministic scripts. Validation, installation, host readback, publication,
+and live status are independent evidence layers.
 
 ## Local validation
 
@@ -64,23 +60,23 @@ From the repository root:
 
 ```text
 python -B -m pytest -q tests
-python <skill-creator>/scripts/quick_validate.py skills/agent-plugins-authoring
-python <plugin-creator>/scripts/validate_plugin.py .
 python skills/agent-plugins-authoring/scripts/validate_agent_plugin.py . --format json
-python skills/agent-plugins-authoring/scripts/reconcile_manifests.py . --format json
-python skills/agent-plugins-authoring/scripts/refresh_upstream.py --offline --format json
+python skills/agent-plugins-authoring/scripts/validate_skill_design.py . --format json
+python skills/agent-plugins-authoring/scripts/materialize_ide_adapter.py . --check --format json
+python skills/agent-plugins-authoring/scripts/reconcile_surfaces.py . --format json
+python skills/agent-plugins-authoring/scripts/build_report.py . --format json
 ```
 
-The GitHub Actions workflow runs the repository-independent checks. The local
-`plugin-creator` validator is additionally run on hosts where that Codex skill
-is installed.
+The package gate also runs the deterministic archive builder and verifies that
+repeated output has the same bytes. Host installation and readback are not
+performed by the source-local validation suite.
 
 ## Public-directory boundary
 
 This repository is ready for GitHub/repo-marketplace distribution and for a
 skills-only public submission package. A GitHub repository does not by itself
 publish a plugin to OpenAI's Universal Plugins Directory. That publication
-requires the OpenAI submission portal, a verified developer identity, review,
+requires the OpenAI submission portal, verified developer identity, review,
 and an explicit publish action.
 
 ## License

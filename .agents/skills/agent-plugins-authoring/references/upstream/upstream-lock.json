@@ -1,0 +1,47 @@
+{
+  "schema_version": "agent-plugins-author.upstream-lock.v1",
+  "adopted": {
+    "version": "1.0.0",
+    "status": "PUBLISHED",
+    "repository": "agentplugins/agent-plugins-spec",
+    "ref": "main",
+    "commit": "ff8ab5e392cc87bd88d87c060815a87490e51003",
+    "tree": "407b02f03fce74dc7f7262c0f992dfce7dacfd3b",
+    "files": [
+      {
+        "path": "schemas/1.0.0/plugin.schema.json",
+        "sha256": "0a4aad95ce337878ad38802ebf0daa3fde76abe3f65400c86bcbb1ec0b3ab883"
+      },
+      {
+        "path": "schemas/1.0.0/mcp.schema.json",
+        "sha256": "6539175bfcdf43085855183e86da40ea94b166547a72b47ae9a0a390516d3acb"
+      }
+    ]
+  },
+  "observed": {
+    "repository": "agentplugins/agent-plugins-spec",
+    "ref": "main",
+    "commit": "ff8ab5e392cc87bd88d87c060815a87490e51003",
+    "tree": "407b02f03fce74dc7f7262c0f992dfce7dacfd3b",
+    "versions": [
+      {"version": "1.0.0", "status": "PUBLISHED"},
+      {"version": "1.1.0", "status": "WORKING_DRAFT"}
+    ]
+  },
+  "related_sources": {
+    "agent_plugins_site": {
+      "repository": "agentplugins/agent-plugins-site",
+      "ref": "main",
+      "commit": "c4a3a8dc683838f14d178392aaeaabeba4533377",
+      "tree": "8ac9554fb9b36149d7b9fc593d1066da1ee1f9bd"
+    },
+    "agent_skills": {
+      "url": "https://agentskills.io/specification",
+      "status": "REFERENCE"
+    },
+    "mcp": {
+      "url": "https://modelcontextprotocol.io/specification",
+      "status": "REFERENCE"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "skill": "agent-plugins-authoring",
+  "should_trigger": [
+    "Create a portable Agent Plugin manifest",
+    "Audit this Codex marketplace adapter",
+    "Package the bundled skills for an IDE"
+  ],
+  "should_not_trigger": [
+    "Why is this SELECT query slow?",
+    "Change this Pydantic model",
+    "Explain the latest frontend layout issue"
+  ],
+  "ambiguous": [
+    "Change persistence for this entity"
+  ],
+  "competing_skill": [
+    {
+      "prompt": "Change persistence for this entity",
+      "expected_skill": null
+    }
+  ]
+}

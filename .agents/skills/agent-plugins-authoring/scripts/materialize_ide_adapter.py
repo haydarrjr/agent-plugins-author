@@ -1,0 +1,196 @@
+#!/usr/bin/env python3
+"""Materialize and verify the generated Codex IDE skill surface."""
+
+from __future__ import annotations
+
+import argparse
+import shutil
+import sys
+from pathlib import Path
+from typing import Any
+
+from common import is_link_like, relative_path, sha256_bytes, stable_json
+
+
+def _issue(code: str, message: str, path: str | None = None) -> dict[str, str]:
+    issue = {"code": code, "message": message}
+    if path:
+        issue["path"] = path
+    return issue
+
+
+def _canonical_files(root: Path) -> tuple[dict[str, Path], list[dict[str, str]]]:
+    skills_root = root / "skills"
+    expected: dict[str, Path] = {}
+    issues: list[dict[str, str]] = []
+    if not skills_root.is_dir():
+        return expected, [_issue("IDE_SOURCE_MISSING", "canonical skills/ directory is missing", "skills")]
+    for skill_dir in sorted(
+        (path for path in skills_root.iterdir() if path.is_dir()),
+        key=lambda path: path.name.lower(),
+    ):
+        if is_link_like(skill_dir):
+            issues.append(_issue("IDE_SOURCE_LINK", "canonical skill directory must not be linked", relative_path(root, skill_dir)))
+            continue
+        skill_file = skill_dir / "SKILL.md"
+        if not skill_file.is_file():
+            issues.append(_issue("IDE_SOURCE_MISSING", "canonical skill must contain SKILL.md", relative_path(root, skill_file)))
+            continue
+        for path in sorted(
+            (
+                candidate
+                for candidate in skill_dir.rglob("*")
+                if candidate.is_file()
+                and "__pycache__" not in candidate.parts
+                and candidate.suffix.lower() not in {".pyc", ".pyo"}
+            ),
+            key=lambda candidate: candidate.relative_to(skill_dir).as_posix().lower(),
+        ):
+            if is_link_like(path):
+                issues.append(_issue("IDE_SOURCE_LINK", "canonical skill file must not be linked", relative_path(root, path)))
+                continue
+            relative = f"{skill_dir.name}/{path.relative_to(skill_dir).as_posix()}"
+            expected[relative] = path
+    return expected, issues
+
+
+def _actual_files(output_root: Path) -> tuple[dict[str, Path], list[dict[str, str]]]:
+    actual: dict[str, Path] = {}
+    issues: list[dict[str, str]] = []
+    if not output_root.exists():
+        return actual, issues
+    if is_link_like(output_root):
+        return actual, [_issue("IDE_OUTPUT_LINK", "generated IDE skill root must not be linked", ".agents/skills")]
+    for path in sorted(
+        (candidate for candidate in output_root.rglob("*") if candidate.is_file()),
+        key=lambda candidate: candidate.relative_to(output_root).as_posix().lower(),
+    ):
+        if is_link_like(path):
+            issues.append(_issue("IDE_OUTPUT_LINK", "generated IDE skill file must not be linked", path.relative_to(output_root).as_posix()))
+            continue
+        actual[path.relative_to(output_root).as_posix()] = path
+    return actual, issues
+
+
+def _missing_code(relative: str) -> str:
+    if relative.endswith("/agents/openai.yaml"):
+        return "IDE_SKILL_METADATA_MISSING"
+    if "/references/" in f"/{relative}":
+        return "IDE_REFERENCE_MISSING"
+    if "/scripts/" in f"/{relative}":
+        return "IDE_SCRIPT_MISSING"
+    return "IDE_SKILL_MISSING"
+
+
+def _mismatch_code(relative: str) -> str:
+    if relative.endswith("/agents/openai.yaml"):
+        return "IDE_SKILL_METADATA_MISMATCH"
+    return "IDE_SKILL_HASH_MISMATCH"
+
+
+def reconcile(root: Path, output_root: Path | None = None) -> dict[str, Any]:
+    output = output_root or (root / ".agents" / "skills")
+    expected, issues = _canonical_files(root)
+    actual, output_issues = _actual_files(output)
+    issues.extend(output_issues)
+    for relative, source in expected.items():
+        target = actual.get(relative)
+        if target is None:
+            issues.append(_issue(_missing_code(relative), "generated IDE surface is missing canonical content", relative))
+            continue
+        try:
+            source_bytes = source.read_bytes()
+            target_bytes = target.read_bytes()
+        except OSError as exc:
+            issues.append(_issue("IDE_READ_ERROR", str(exc), relative))
+            continue
+        if source_bytes != target_bytes:
+            issues.append(
+                _issue(
+                    _mismatch_code(relative),
+                    f"canonical={sha256_bytes(source_bytes)} generated={sha256_bytes(target_bytes)}",
+                    relative,
+                )
+            )
+    for relative in sorted(set(actual) - set(expected), key=str.lower):
+        issues.append(_issue("IDE_SKILL_EXTRA", "generated IDE surface contains non-canonical content", relative))
+    if any(path.name.lower() == "agents.md" for path in output.rglob("*") if path.is_file()):
+        issues.append(_issue("IDE_AGENTS_GENERATED", "AGENTS.md is not generated by the IDE adapter", ".agents/skills"))
+    return {
+        "status": "PASS" if not issues else "FAIL",
+        "source": "skills/",
+        "target": ".agents/skills/" if output_root is None else str(output),
+        "expected_files": len(expected),
+        "actual_files": len(actual),
+        "checks": {
+            "skill_discovery": "PASS" if expected else "FAIL",
+            "hash_parity": "PASS" if not any(issue["code"] == "IDE_SKILL_HASH_MISMATCH" for issue in issues) else "FAIL",
+            "metadata_parity": "PASS" if not any("METADATA" in issue["code"] for issue in issues) else "FAIL",
+            "references": "PASS" if not any("REFERENCE" in issue["code"] for issue in issues) else "FAIL",
+            "scripts": "PASS" if not any("SCRIPT" in issue["code"] for issue in issues) else "FAIL",
+            "no_generated_agents": "PASS" if not any(issue["code"] == "IDE_AGENTS_GENERATED" for issue in issues) else "FAIL",
+        },
+        "issues": issues,
+    }
+
+
+def materialize(root: Path, output_root: Path | None = None, prune: bool = False) -> dict[str, Any]:
+    output = output_root or (root / ".agents" / "skills")
+    expected, issues = _canonical_files(root)
+    if issues:
+        return {"status": "FAIL", "changed_files": [], "issues": issues}
+    if output.exists() and is_link_like(output):
+        return {"status": "FAIL", "changed_files": [], "issues": [_issue("IDE_OUTPUT_LINK", "generated IDE skill root must not be linked", str(output))]}
+    output.mkdir(parents=True, exist_ok=True)
+    changed: list[str] = []
+    actual, actual_issues = _actual_files(output)
+    if actual_issues:
+        return {"status": "FAIL", "changed_files": [], "issues": actual_issues}
+    if prune:
+        for relative, path in sorted(actual.items(), key=lambda item: item[0].lower(), reverse=True):
+            if relative not in expected:
+                path.unlink()
+                changed.append(relative)
+        for directory in sorted(
+            (path for path in output.rglob("*") if path.is_dir()),
+            key=lambda path: path.as_posix().lower(),
+            reverse=True,
+        ):
+            if not any(directory.iterdir()):
+                directory.rmdir()
+    for relative, source in expected.items():
+        target = output / Path(relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        source_bytes = source.read_bytes()
+        if not target.is_file() or target.read_bytes() != source_bytes:
+            target.write_bytes(source_bytes)
+            changed.append(relative)
+    report = reconcile(root, output)
+    report["changed_files"] = sorted(set(changed), key=str.lower)
+    return report
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("plugin_root", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--check", action="store_true", help="verify parity without changing files")
+    parser.add_argument("--prune", action="store_true", help="remove stale files from the generated surface")
+    parser.add_argument("--format", choices={"json", "text"}, default="text")
+    args = parser.parse_args()
+    output = args.output
+    report = reconcile(args.plugin_root, output) if args.check else materialize(args.plugin_root, output, prune=args.prune)
+    if args.format == "json":
+        print(stable_json(report), end="")
+    else:
+        print(f"{report['status']}: {args.plugin_root}")
+        if "changed_files" in report:
+            print(f"changed={len(report['changed_files'])}")
+        for issue in report.get("issues", []):
+            location = f" [{issue['path']}]" if "path" in issue else ""
+            print(f"- {issue['code']}{location}: {issue['message']}")
+    return 0 if report["status"] == "PASS" else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

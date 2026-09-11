@@ -35,6 +35,6 @@ def test_codex_adapter_references_the_original_icon():
 def test_icon_provenance_hash_matches_source():
     provenance = json.loads(PROVENANCE.read_text(encoding="utf-8"))
     record = provenance["files"]["assets/icon.svg"]
-    digest = hashlib.sha256(ICON.read_bytes()).hexdigest()
+    digest = hashlib.sha256(ICON.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
     assert record["origin"] == "original-authored"
     assert record["sha256"] == digest

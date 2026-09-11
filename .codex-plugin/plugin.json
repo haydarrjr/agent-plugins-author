@@ -1,7 +1,7 @@
 {
   "name": "agent-plugins-author",
-  "version": "0.1.1",
-  "description": "Create, validate, refresh, and maintain portable Agent Plugins with a Codex adapter.",
+  "version": "0.2.0",
+  "description": "Create, audit, update, and package Agent Plugins. Use for plugin manifests, bundled skills, Codex adapters, marketplace distribution, or IDE compatibility.",
   "author": {
     "name": "Önder Türkan",
     "url": "https://github.com/haydarrjr"
@@ -14,7 +14,7 @@
     "developerName": "Önder Türkan",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "Create or audit an Agent Plugin with portable and Codex-compatible contracts.",
+    "defaultPrompt": "Create, audit, update, or package an Agent Plugin across portable, Codex, marketplace, and IDE skill surfaces.",
     "brandColor": "#111B4A",
     "composerIcon": "./assets/icon.svg",
     "logo": "./assets/icon.svg",

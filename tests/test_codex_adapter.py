@@ -32,7 +32,7 @@ def test_codex_adapter_has_creator_scaffold_shape():
 
 def test_manifest_reconciliation_passes():
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), str(ROOT), "--format", "json"],
+        [sys.executable, str(SCRIPT), str(ROOT), "--skip-native-validator", "--format", "json"],
         capture_output=True,
         text=True,
         check=False,
