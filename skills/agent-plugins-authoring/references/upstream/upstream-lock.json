@@ -10,11 +10,11 @@
     "files": [
       {
         "path": "schemas/1.0.0/plugin.schema.json",
-        "sha256": "189e8df73f9108cd595970608593c2a41e50a67470967f1b239d6880af1348fa"
+        "sha256": "0a4aad95ce337878ad38802ebf0daa3fde76abe3f65400c86bcbb1ec0b3ab883"
       },
       {
         "path": "schemas/1.0.0/mcp.schema.json",
-        "sha256": "07700088623caf37f3da40a567392e9aeb70088caff16fe235d436a3a97bf129"
+        "sha256": "6539175bfcdf43085855183e86da40ea94b166547a72b47ae9a0a390516d3acb"
       }
     ]
   },

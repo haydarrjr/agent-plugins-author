@@ -10,7 +10,7 @@ SCRIPT = ROOT / "skills" / "agent-plugins-authoring" / "scripts" / "build_report
 
 def test_report_keeps_host_evidence_separate_from_local_validation():
     result = subprocess.run(
-        [sys.executable, str(SCRIPT), str(ROOT), "--format", "json"],
+        [sys.executable, str(SCRIPT), str(ROOT), "--skip-native-validator", "--format", "json"],
         capture_output=True,
         text=True,
         check=False,

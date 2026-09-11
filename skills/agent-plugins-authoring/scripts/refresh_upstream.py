@@ -12,7 +12,7 @@ from urllib.error import URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-from common import sha256_file, stable_json, strict_json_load
+from common import stable_json, strict_json_load
 
 
 SPEC_REPOSITORY = "agentplugins/agent-plugins-spec"
@@ -34,6 +34,13 @@ def fetch_json(url: str):
     return json.loads(fetch(url).decode("utf-8"))
 
 
+def snapshot_sha256(path: Path) -> str:
+    """Hash checked-in text snapshots using repository-normalized line endings."""
+
+    data = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def snapshot_path(source_root: Path, version: str, source_path: str) -> Path:
     direct = source_root / source_path
     if direct.is_file():
@@ -51,7 +58,7 @@ def local_report(lock: dict, source_root: Path) -> dict:
         if not path.is_file():
             diffs.append(f"missing snapshot: {entry['path']}")
             continue
-        actual = sha256_file(path)
+        actual = snapshot_sha256(path)
         files.append({"path": entry["path"], "sha256": actual})
         if actual != entry.get("sha256"):
             diffs.append(f"hash changed: {entry['path']}")
