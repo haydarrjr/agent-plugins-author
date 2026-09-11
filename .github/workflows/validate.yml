@@ -41,6 +41,21 @@ jobs:
       - name: Reconcile Codex adapter
         run: python skills/agent-plugins-authoring/scripts/reconcile_manifests.py . --skip-native-validator --format json
 
+      - name: Validate Astra skill design and trigger routing
+        run: python skills/agent-plugins-authoring/scripts/validate_skill_design.py . --format json
+
+      - name: Verify generated Codex IDE adapter
+        run: python skills/agent-plugins-authoring/scripts/materialize_ide_adapter.py . --check --format json
+
+      - name: Reconcile all distribution surfaces
+        run: python skills/agent-plugins-authoring/scripts/reconcile_surfaces.py . --skip-native-validator --format json
+
+      - name: Verify marketplace rendering
+        run: python skills/agent-plugins-authoring/scripts/render_marketplace.py . --check --format json
+
+      - name: Build scoped evidence report
+        run: python skills/agent-plugins-authoring/scripts/build_report.py . --skip-native-validator --format json
+
       - name: Validate upstream baseline offline
         run: python skills/agent-plugins-authoring/scripts/refresh_upstream.py --offline --format json --output "$RUNNER_TEMP/upstream-report.json"
 
@@ -51,3 +66,33 @@ jobs:
             echo "Generated Python cache detected"
             exit 1
           fi
+
+  package:
+    name: Build deterministic plugin package
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build package archive
+        run: python skills/agent-plugins-authoring/scripts/build_package.py . --output "$RUNNER_TEMP/agent-plugins-author.zip" --format json
+
+      - name: Replay package build and compare bytes
+        run: |
+          python skills/agent-plugins-authoring/scripts/build_package.py . --output "$RUNNER_TEMP/agent-plugins-author-replay.zip" --format json
+          cmp "$RUNNER_TEMP/agent-plugins-author.zip" "$RUNNER_TEMP/agent-plugins-author-replay.zip"
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-plugins-author-package
+          path: ${{ runner.temp }}/agent-plugins-author.zip
+          if-no-files-found: error

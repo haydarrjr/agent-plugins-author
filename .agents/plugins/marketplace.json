@@ -1,21 +1,21 @@
 {
-  "name": "agent-plugins-author",
   "interface": {
     "displayName": "Agent Plugins Author"
   },
+  "name": "agent-plugins-author",
   "plugins": [
     {
+      "category": "Productivity",
       "name": "agent-plugins-author",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/haydarrjr/agent-plugins-author.git",
-        "ref": "main"
-      },
       "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
+        "authentication": "ON_INSTALL",
+        "installation": "AVAILABLE"
       },
-      "category": "Productivity"
+      "source": {
+        "ref": "main",
+        "source": "url",
+        "url": "https://github.com/haydarrjr/agent-plugins-author.git"
+      }
     }
   ]
 }

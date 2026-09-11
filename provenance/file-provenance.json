@@ -4,7 +4,7 @@
     "assets/icon.svg": {
       "origin": "original-authored",
       "classification": "ORIGINAL",
-      "sha256": "be8b078607e316b16284bfcd8c7e533789b18987bb149e6d2735143cd9fb2f8a",
+      "sha256": "6611f914356ed93d2fc70e21ac3c09b48487e36876c7729ed6d5899d7c2610e9",
       "notes": "Hand-authored self-contained SVG; no external image, font, script, or copied artwork dependency."
     }
   }
