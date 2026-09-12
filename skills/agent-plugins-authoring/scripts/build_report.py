@@ -52,6 +52,7 @@ def build(
         skill_design["status"],
         security_status,
         surfaces["status"],
+        surfaces.get("github_copilot", {}).get("status", "UNVERIFIED"),
         upstream_gate,
     ]
     if "FAIL" in source_statuses:
@@ -67,7 +68,7 @@ def build(
     }
     ide_discovery = {
         "status": "NOT_RUN",
-        "checks": ["generated skill parity does not prove host discovery"],
+        "checks": ["source parity does not prove Codex IDE, VS Code, or Copilot host discovery"],
     }
     host_readback = {"status": "NOT_RUN", "checks": []}
     live_status = {"status": "NOT_RUN", "checks": []}
@@ -86,6 +87,7 @@ def build(
         "upstream": {**upstream, "gate_status": upstream_gate},
         "codex_plugin_adapter": surfaces.get("codex_plugin_adapter", {"status": "UNVERIFIED"}),
         "codex_ide_adapter": surfaces.get("codex_ide_adapter", {"status": "UNVERIFIED"}),
+        "github_copilot": surfaces.get("github_copilot", {"status": "UNVERIFIED"}),
         "marketplace": surfaces.get("marketplace", {"status": "NOT_RUN"}),
         "mcp_host_config": surfaces.get("mcp_host_config", {"status": "NOT_RUN"}),
         "tests": {"status": "NOT_RUN", "checks": {"change_scoped": "NOT_RUN", "determinism": "NOT_RUN", "full_suite": "NOT_RUN"}},
@@ -95,7 +97,7 @@ def build(
         "host_readback": host_readback,
         "live_status": live_status,
         "provenance": surfaces.get("provenance", {}),
-        "next_action": "Run the change-scoped validators and deterministic package gate; installation, host readback, and live status remain separate optional operations.",
+        "next_action": "Run the affected source-local validators and deterministic package gate; installation, host readback, and live status remain separate optional operations.",
     }
 
 
@@ -125,7 +127,7 @@ def main() -> int:
         print(
             " ".join(
                 f"{name}={report[name]['status']}"
-                for name in ("portable", "skill_design", "security", "codex_plugin_adapter", "codex_ide_adapter", "marketplace")
+                for name in ("portable", "skill_design", "security", "codex_plugin_adapter", "codex_ide_adapter", "github_copilot", "marketplace")
                 if name in report
             )
         )

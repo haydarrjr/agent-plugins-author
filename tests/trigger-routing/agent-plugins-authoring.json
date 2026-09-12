@@ -3,7 +3,8 @@
   "should_trigger": [
     "Create a portable Agent Plugin manifest",
     "Audit this Codex marketplace adapter",
-    "Package the bundled skills for an IDE"
+    "Package the bundled skills for an IDE",
+    "Make this Agent Plugin installable in VS Code GitHub Copilot"
   ],
   "should_not_trigger": [
     "Why is this SELECT query slow?",

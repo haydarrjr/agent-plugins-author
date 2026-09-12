@@ -38,6 +38,9 @@ jobs:
       - name: Validate portable package
         run: python skills/agent-plugins-authoring/scripts/validate_agent_plugin.py . --format json
 
+      - name: Validate GitHub Copilot and VS Code Agent Plugins surface
+        run: python skills/agent-plugins-authoring/scripts/validate_copilot_surface.py . --require-marketplace --format json
+
       - name: Reconcile Codex adapter
         run: python skills/agent-plugins-authoring/scripts/reconcile_manifests.py . --skip-native-validator --format json
 
@@ -50,8 +53,11 @@ jobs:
       - name: Reconcile all distribution surfaces
         run: python skills/agent-plugins-authoring/scripts/reconcile_surfaces.py . --skip-native-validator --format json
 
-      - name: Verify marketplace rendering
+      - name: Verify Codex marketplace rendering
         run: python skills/agent-plugins-authoring/scripts/render_marketplace.py . --check --format json
+
+      - name: Verify GitHub Copilot marketplace rendering
+        run: python skills/agent-plugins-authoring/scripts/render_copilot_marketplace.py . --check --format json
 
       - name: Build scoped evidence report
         run: python skills/agent-plugins-authoring/scripts/build_report.py . --skip-native-validator --format json

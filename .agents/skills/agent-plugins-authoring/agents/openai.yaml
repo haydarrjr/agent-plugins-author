@@ -1,7 +1,7 @@
 interface:
   display_name: "Agent Plugins Authoring"
-  short_description: "Author portable plugins and compatible skill surfaces"
-  default_prompt: "Create, audit, update, or package an Agent Plugin across portable, Codex, marketplace, and IDE skill surfaces."
+  short_description: "Author portable Agent Plugins for Codex and GitHub Copilot"
+  default_prompt: "Create, audit, update, or package an Agent Plugin with portable Agent Plugins 1.0, Astra-aware skill design, and the requested Codex or GitHub Copilot surfaces."
 
 policy:
   allow_implicit_invocation: true

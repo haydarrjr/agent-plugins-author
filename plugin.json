@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "agent-plugins-author",
-  "version": "0.2.0",
-  "description": "Create, audit, update, and package Agent Plugins. Use for plugin manifests, bundled skills, Codex adapters, marketplace distribution, or IDE compatibility.",
+  "version": "0.3.0",
+  "description": "Author, audit, and package Agent Plugins. Use for portable manifests, skills, marketplaces, or Codex/Copilot IDE compatibility.",
   "author": {
     "name": "Önder Türkan",
     "url": "https://github.com/haydarrjr"
@@ -13,6 +13,8 @@
   "keywords": [
     "agent-plugins",
     "codex",
+    "github-copilot",
+    "vscode",
     "skills",
     "authoring",
     "validation",

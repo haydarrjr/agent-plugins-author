@@ -26,6 +26,7 @@ def test_report_keeps_host_evidence_separate_from_local_validation():
         "upstream",
         "codex_plugin_adapter",
         "codex_ide_adapter",
+        "github_copilot",
         "security",
         "marketplace",
         "mcp_host_config",
@@ -44,3 +45,4 @@ def test_report_keeps_host_evidence_separate_from_local_validation():
     assert report["ide_skill_discovery"]["status"] == "NOT_RUN"
     assert report["host_readback"]["status"] == "NOT_RUN"
     assert report["marketplace"]["status"] == "PASS"
+    assert report["github_copilot"]["status"] == "PASS"
