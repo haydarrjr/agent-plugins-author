@@ -20,6 +20,7 @@ def test_all_checked_in_surfaces_reconcile_without_host_inference():
     assert report["status"] == "PASS"
     assert report["codex_plugin_adapter"]["status"] == "PASS"
     assert report["codex_ide_adapter"]["status"] == "PASS"
+    assert report["github_copilot"]["status"] == "PASS"
     assert report["marketplace"]["status"] == "PASS"
     assert report["mcp_host_config"]["status"] == "NOT_RUN"
     assert report["provenance"]["adapter_lock"]["status"] == "PASS"

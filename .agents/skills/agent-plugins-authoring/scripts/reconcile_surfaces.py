@@ -13,6 +13,7 @@ from common import PORTABLE_SCHEMA, SECRET_VALUE_PATTERNS, make_issue, stable_js
 from materialize_ide_adapter import reconcile as reconcile_ide
 from reconcile_manifests import reconcile as reconcile_manifests
 from render_mcp_config import render as render_mcp_config
+from validate_copilot_surface import validate as validate_copilot_surface
 
 
 def _repository_url(manifest: dict[str, Any]) -> str | None:
@@ -23,14 +24,15 @@ def _repository_url(manifest: dict[str, Any]) -> str | None:
 
 
 def marketplace_status(root: Path, manifest: dict[str, Any], native: dict[str, Any]) -> dict[str, Any]:
+    """Validate the Codex repository marketplace independently of Copilot."""
     path = root / ".agents" / "plugins" / "marketplace.json"
     if not path.is_file():
-        return {"status": "NOT_RUN", "surface": "repo", "path": str(path), "checks": [], "issues": []}
+        return {"status": "NOT_RUN", "surface": "codex_repo", "path": str(path), "checks": [], "issues": []}
     issues: list[dict[str, str]] = []
     try:
         catalog = strict_json_load(path)
     except (OSError, ValueError) as exc:
-        return {"status": "FAIL", "surface": "repo", "path": str(path), "checks": [], "issues": [make_issue("MARKETPLACE_JSON", str(exc), str(path))]}
+        return {"status": "FAIL", "surface": "codex_repo", "path": str(path), "checks": [], "issues": [make_issue("MARKETPLACE_JSON", str(exc), str(path))]}
     name = manifest.get("name")
     entries = catalog.get("plugins", []) if isinstance(catalog, dict) else []
     matching = [entry for entry in entries if isinstance(entry, dict) and entry.get("name") == name]
@@ -42,33 +44,26 @@ def marketplace_status(root: Path, manifest: dict[str, Any], native: dict[str, A
         source = entry.get("source", {})
         expected_url = (_repository_url(manifest) or "") + ".git"
         if source.get("source") != "url" or source.get("url") != expected_url:
-            issues.append(make_issue("MARKETPLACE_IDENTITY", "marketplace URL must match portable repository identity", str(path)))
+            issues.append(make_issue("MARKETPLACE_IDENTITY", "Codex marketplace URL must match portable repository identity", str(path)))
         ref = source.get("ref")
         if not isinstance(ref, str) or not ref:
-            issues.append(make_issue("MARKETPLACE_REF", "marketplace source requires a ref", str(path)))
-        if source.get("ref") == "main":
-            mode = "development"
-        else:
-            mode = "release"
+            issues.append(make_issue("MARKETPLACE_REF", "Codex marketplace source requires a ref", str(path)))
+        mode = "development" if source.get("ref") == "main" else "release"
         expected_policy = {"installation": "AVAILABLE", "authentication": "ON_INSTALL"}
         if entry.get("policy") != expected_policy:
-            issues.append(make_issue("MARKETPLACE_POLICY", "marketplace policy must keep installation and authentication explicit", str(path)))
+            issues.append(make_issue("MARKETPLACE_POLICY", "Codex marketplace policy must keep installation and authentication explicit", str(path)))
         expected_category = native.get("interface", {}).get("category", "Productivity")
         if entry.get("category") != expected_category:
-            issues.append(make_issue("MARKETPLACE_CATEGORY", "marketplace category must match the native adapter", str(path)))
-        serialized = json.dumps(catalog, ensure_ascii=False).lower()
-        if any(marker in serialized for marker in ("vs_code", "vscode", "codex_ide")):
-            issues.append(make_issue("MARKETPLACE_IDE_CLAIM", "marketplace metadata must not claim IDE plugin support", str(path)))
+            issues.append(make_issue("MARKETPLACE_CATEGORY", "Codex marketplace category must match the native adapter", str(path)))
     return {
         "status": "PASS" if not issues else "FAIL",
-        "surface": "repo",
+        "surface": "codex_repo",
         "path": str(path),
         "mode": mode if matching else None,
         "ref": matching[0].get("source", {}).get("ref") if matching else None,
         "checks": {
             "identity": "PASS" if not any(item["code"] == "MARKETPLACE_IDENTITY" for item in issues) else "FAIL",
             "policy": "PASS" if not any(item["code"] == "MARKETPLACE_POLICY" for item in issues) else "FAIL",
-            "ide_boundary": "PASS" if not any(item["code"] == "MARKETPLACE_IDE_CLAIM" for item in issues) else "FAIL",
         },
         "issues": issues,
     }
@@ -120,7 +115,10 @@ def adapter_lock_status(root: Path, manifest: dict[str, Any]) -> dict[str, Any]:
     if surfaces.get("portable", {}).get("skills") != "skills/":
         issues.append(make_issue("ADAPTER_LOCK_CANONICAL", "adapter lock must name skills/ as canonical source", str(path)))
     if surfaces.get("codex_ide", {}).get("skills") != ".agents/skills/":
-        issues.append(make_issue("ADAPTER_LOCK_IDE", "adapter lock must name .agents/skills/ as generated IDE surface", str(path)))
+        issues.append(make_issue("ADAPTER_LOCK_IDE", "adapter lock must name .agents/skills/ as generated Codex IDE surface", str(path)))
+    copilot = surfaces.get("github_copilot", {})
+    if copilot.get("skills") != "skills/" or copilot.get("marketplace") != ".github/plugin/marketplace.json":
+        issues.append(make_issue("ADAPTER_LOCK_COPILOT", "adapter lock must record canonical Copilot skills and marketplace surfaces", str(path)))
     return {
         "status": "PASS" if not issues else "FAIL",
         "path": str(path),
@@ -134,8 +132,6 @@ def reconcile_surfaces(
     run_native_validator: bool = True,
     creator_validator: Path | None = None,
 ) -> dict[str, Any]:
-    manifest: dict[str, Any]
-    native: dict[str, Any]
     try:
         manifest = strict_json_load(root / "plugin.json")
     except (OSError, ValueError):
@@ -146,10 +142,11 @@ def reconcile_surfaces(
         native = {}
     manifest_report = reconcile_manifests(root, run_native_validator, creator_validator)
     ide_report = reconcile_ide(root)
-    marketplace = marketplace_status(root, manifest, native)
+    codex_marketplace = marketplace_status(root, manifest, native)
+    copilot = validate_copilot_surface(root, require_marketplace=True)
     mcp = mcp_host_status(root)
     lock = adapter_lock_status(root, manifest)
-    surface_reports = [manifest_report, ide_report, marketplace, mcp, lock]
+    surface_reports = [manifest_report, ide_report, codex_marketplace, copilot, mcp, lock]
     issues: list[dict[str, str]] = []
     for report in surface_reports:
         issues.extend(report.get("issues", []))
@@ -165,7 +162,8 @@ def reconcile_surfaces(
         "portable": manifest_report.get("portable", {"status": "UNVERIFIED"}),
         "codex_plugin_adapter": manifest_report.get("codex_plugin_adapter", {"status": "UNVERIFIED"}),
         "codex_ide_adapter": ide_report,
-        "marketplace": marketplace,
+        "github_copilot": copilot,
+        "marketplace": codex_marketplace,
         "mcp_host_config": mcp,
         "provenance": {"adapter_lock": lock},
         "issues": issues,

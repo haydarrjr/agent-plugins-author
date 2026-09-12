@@ -2,7 +2,7 @@
   "schema_version": "agent-plugins-author.adapter-lock.v1",
   "plugin": {
     "name": "agent-plugins-author",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "surfaces": {
     "portable": {
@@ -17,6 +17,12 @@
       "skills": ".agents/skills/",
       "generated_by": "skills/agent-plugins-authoring/scripts/materialize_ide_adapter.py",
       "agents_policy": "not_generated"
+    },
+    "github_copilot": {
+      "manifest": "plugin.json",
+      "skills": "skills/",
+      "marketplace": ".github/plugin/marketplace.json",
+      "client_namespace": "com.github.copilot/"
     },
     "marketplace": {
       "path": ".agents/plugins/marketplace.json",

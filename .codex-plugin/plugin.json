@@ -1,7 +1,7 @@
 {
   "name": "agent-plugins-author",
-  "version": "0.2.0",
-  "description": "Create, audit, update, and package Agent Plugins. Use for plugin manifests, bundled skills, Codex adapters, marketplace distribution, or IDE compatibility.",
+  "version": "0.3.0",
+  "description": "Author, audit, and package Agent Plugins. Use for portable manifests, skills, marketplaces, or Codex/Copilot IDE compatibility.",
   "author": {
     "name": "Önder Türkan",
     "url": "https://github.com/haydarrjr"
@@ -9,12 +9,12 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Agent Plugins Author",
-    "shortDescription": "Create and validate portable Agent Plugins.",
-    "longDescription": "Agent Plugins Author keeps portable Agent Plugins, upstream contracts, provenance, security checks, and the Codex compatibility adapter separate and verifiable.",
+    "shortDescription": "Author portable Agent Plugins for Codex and GitHub Copilot.",
+    "longDescription": "Agent Plugins Author keeps the portable Agent Plugins 1.0 contract authoritative while applying Astra-aware skill design and validating separate Codex and GitHub Copilot distribution surfaces.",
     "developerName": "Önder Türkan",
     "category": "Productivity",
     "capabilities": [],
-    "defaultPrompt": "Create, audit, update, or package an Agent Plugin across portable, Codex, marketplace, and IDE skill surfaces.",
+    "defaultPrompt": "Create, audit, update, or package an Agent Plugin with portable Agent Plugins 1.0, Astra-aware skill design, and the requested Codex or GitHub Copilot surfaces.",
     "brandColor": "#111B4A",
     "composerIcon": "./assets/icon.svg",
     "logo": "./assets/icon.svg",

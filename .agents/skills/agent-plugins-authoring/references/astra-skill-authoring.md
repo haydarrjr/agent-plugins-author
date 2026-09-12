@@ -1,67 +1,82 @@
-# Astra-aware skill authoring
+# Astra-aware skill and prompt authoring
 
-## 1. Scope
+## Scope and authority
 
-Use this reference when creating, updating, or auditing skill metadata and
-root instructions. It describes routing quality, context economy, and
-progressive disclosure; it does not replace the portable or host contracts.
+Use this reference when creating, updating, or auditing skill metadata, root
+instructions, or repository-wide agent guidance. It implements the principles
+from OpenAI's September 11, 2026 guidance, "Rethinking skills and prompts for
+GPT-6 Astra":
 
-## 2. Description design
+https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra
 
-Lead with the job, then name the narrow trigger scope. Keep descriptions short
-enough to survive initial index shortening. `Use when ...` is a valid pattern,
-not a required syntax. Avoid broad phrases such as “working with databases”
-when the skill is only for migrations.
+This reference does not replace portable plugin, security, or host contracts.
 
-## 3. Progressive disclosure
+## Descriptions and routing
 
-Keep the root `SKILL.md` a router: enough context to choose the workflow,
-important boundaries, and links to conditional references. Put detailed
-contracts, examples, and deterministic mechanics in `references/` or
-`scripts/`.
+Lead with the job and name the narrow trigger scope. Keep descriptions short
+enough to survive index shortening while retaining the terms that distinguish
+the skill from competing skills. `Use when ...` is valid but not required.
+Evaluate positive, negative, ambiguous, and competing-skill prompts; lexical
+similarity is only a routing signal, not proof of host behavior.
 
-## 4. Root SKILL.md design
+## Progressive disclosure
 
-Describe the goal, domain knowledge, important authority boundary, useful
-resources, and completion condition. Do not duplicate every reference in the
-root document.
+Keep root `SKILL.md` files as small routers: goal, authority boundaries,
+completion condition, and contextual links. Put specialized contracts and
+examples in `references/`; put deterministic parsing, validation,
+materialization, reconciliation, or packaging in `scripts/`. When a task spans
+surfaces, consult the references that are actually relevant rather than
+artificially limiting the model to one document.
 
-## 5. References versus scripts
+## Replace recipes with outcomes
 
-Use a reference for knowledge that should be read selectively. Use a script for
-deterministic parsing, validation, materialization, reconciliation, or package
-construction. Scripts must be safe to rerun and must not write credentials.
+Do not encode generic competent-engineer behavior or long itineraries merely
+to control a capable model. Prefer desired outcomes, repository-specific
+constraints, decision boundaries, and relevant references. Keep prescriptive
+steps only when their order is itself a project invariant or protects a real
+security, data, release, or irreversible-operation boundary.
 
-## 6. Decision boundaries
+## AGENTS.md migration
 
-Keep destructive actions, upstream adoption, installation, publication, and
-live readback explicit. A validator may report `PASS` only for its own gate;
-it must not upgrade installation, host, or live evidence.
+Treat `AGENTS.md` as broadly loaded context. Before keeping an instruction,
+ask whether it needs to be present on every task in that scope. Replace blanket
+reading requirements with contextual pointers, remove duplicated or obvious
+engineering advice, and move narrow workflows into scoped guidance or skills.
+Do not generate `AGENTS.md` as a copy of a skill workflow.
 
-## 7. Persistence and completion
+Preserve genuine institutional knowledge: architecture constraints, unusual
+build or test commands, generated-code rules, dependency policy, formatting
+that tooling cannot enforce, deployment restrictions, security boundaries,
+directory ownership, project terminology, and irreversible-operation rules.
+The target is lower prompting noise, not the shortest possible file.
 
-For implementation and update requests, continue through the requested change,
-affected validation, package-caused corrections, and final reconciliation.
-Stop only for a real authority, credential, destructive, or unresolved-source
-boundary, and report that boundary explicitly.
+## Decision boundaries and safe autonomy
 
-## 8. AGENTS.md policy
+Keep explicit approval or stop boundaries for destructive operations,
+production changes, secrets, security-sensitive actions, irreversible
+migrations, external side effects, upstream adoption, installation,
+publication, and live readback. Do not preserve approval barriers that exist
+only because older models were more aggressive.
 
-Do not generate `AGENTS.md` as a copy of a skill workflow. Add it only when a
-repository-wide invariant genuinely needs persistent context, and keep it
-short enough not to load architecture material on every task.
+Grant safe autonomy only when the repository actually supports the claim. For
+this plugin repository, source-local tests and validators do not install,
+publish, or mutate a live host, so affected checks may run and package-caused
+failures may be corrected without per-step approval. Do not generalize that
+statement to an arbitrary target repository without evidence.
 
-## 9. Targeted verification
+## Completion and persistence
 
-Use `validate_skill_design.py` for metadata, disclosure, recipes, collisions,
-and context budget. Pair it with trigger fixtures covering positive, negative,
-ambiguous, and competing-skill prompts. Select the narrowest contract and
-behavior checks for the changed surface; reserve full validation for package or
-release gates.
+Define the completion boundary before implementation. For predictable safe
+workflows, continue through implementation, relevant validation, correction of
+issues introduced by the change, and final reconciliation. Stop when the
+requested behavior works and relevant checks pass, or when a real authority or
+external decision is required.
 
-## 10. Trigger and non-trigger evaluation
+## Verification economy
 
-String similarity is only a candidate signal. Review collisions semantically,
-and preserve an explicit negative set for prompts that should remain outside
-the skill. A routing fixture is evidence about the description, not proof of
-host behavior or model-wide quality.
+Select verification by the affected surface. Applicable contract,
+provenance, and security boundaries remain mandatory; test ordering itself is
+not a ritual unless the repository makes it one. Reserve broad or full-suite
+validation for cross-cutting, package, release, or upstream-adoption gates.
+Avoid duplicating the same rule in `SKILL.md`, references, project docs, and
+task prompts; keep it at the narrowest useful scope.

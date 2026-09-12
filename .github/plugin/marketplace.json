@@ -1,0 +1,37 @@
+{
+  "metadata": {
+    "description": "GitHub Copilot marketplace for agent-plugins-author",
+    "version": "0.3.0"
+  },
+  "name": "agent-plugins-author",
+  "owner": {
+    "name": "Önder Türkan"
+  },
+  "plugins": [
+    {
+      "author": {
+        "name": "Önder Türkan",
+        "url": "https://github.com/haydarrjr"
+      },
+      "category": "Productivity",
+      "description": "Author, audit, and package Agent Plugins. Use for portable manifests, skills, marketplaces, or Codex/Copilot IDE compatibility.",
+      "homepage": "https://github.com/haydarrjr/agent-plugins-author",
+      "keywords": [
+        "agent-plugins",
+        "codex",
+        "github-copilot",
+        "vscode",
+        "skills",
+        "authoring",
+        "validation",
+        "provenance"
+      ],
+      "license": "MIT",
+      "name": "agent-plugins-author",
+      "repository": "https://github.com/haydarrjr/agent-plugins-author",
+      "source": ".",
+      "strict": true,
+      "version": "0.3.0"
+    }
+  ]
+}

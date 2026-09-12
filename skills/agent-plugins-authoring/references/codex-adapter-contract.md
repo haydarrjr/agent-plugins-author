@@ -1,5 +1,12 @@
 # Codex adapter contract
 
+## Scope
+
+This reference covers the native Codex adapter and Codex marketplace only.
+GitHub Copilot in VS Code/CLI/app consumes Agent Plugins 1.0 directly; use
+[copilot-agent-plugins.md](copilot-agent-plugins.md) for that surface. Evidence
+from one client must not be upgraded into evidence for another.
+
 ## Scaffold
 
 Use the bundled `plugin-creator` skill and scripts for the native adapter:
@@ -26,41 +33,17 @@ the platform home `.codex` directory, then capability discovery. If no helper
 is available, report `UNVERIFIED`.
 
 Its local source path is `./plugins/<plugin-name>`. Do not hand-edit this
-file. Use the creator helpers and preserve existing ordering/display metadata.
+file. Use creator helpers and preserve existing ordering/display metadata.
 
-For repository distribution, keep a repo-scoped catalog at:
+For repository distribution, keep the Codex repo catalog at:
 
 ```text
 <repository-root>/.agents/plugins/marketplace.json
 ```
 
 When the plugin is at the repository root, the catalog may use a Git-backed
-root entry:
-
-```json
-{
-  "name": "agent-plugins-author",
-  "plugins": [
-    {
-      "name": "agent-plugins-author",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/haydarrjr/agent-plugins-author.git",
-        "ref": "main"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Productivity"
-    }
-  ]
-}
-```
-
-This catalog is separate from the personal marketplace and from the public
-Universal Plugins Directory. A GitHub repository and repo marketplace can be
-ready for installation without implying OpenAI public-directory publication.
+root entry. This catalog is separate from the personal marketplace, GitHub
+Copilot's `.github/plugin/marketplace.json`, and the OpenAI public directory.
 
 ## Parity
 
@@ -71,22 +54,18 @@ Portable fields must not be polluted with Codex-only fields.
 ## Marketplace modes
 
 Use `development` mode for a moving `main` ref. Use `release` mode for a tag
-or immutable commit SHA. The deterministic marketplace renderer must reject a
-release catalog that points at `main`. A marketplace catalog is not evidence
-of IDE plugin support, installation, host readback, publication, or live use.
+or immutable commit SHA. The deterministic Codex marketplace renderer rejects
+a release catalog that points at `main`. A catalog is source evidence, not
+installation, host readback, publication, or live-use evidence.
 
 ## Existing-plugin updates
 
-For an explicitly requested local update:
-
-1. Read and validate the marketplace name.
-2. Run the creator cachebuster helper when a native package update requires it.
-3. Reinstall only when local installation is explicitly in scope.
-4. Start a new conversation/thread for host testing.
-5. Test representative requests and record host readback separately.
-
-For a GitHub/workspace distribution request, change source, commit, push, and
-read GitHub CI. Do not mutate a personal marketplace or local plugin cache.
+For an explicitly requested local Codex update, preserve marketplace identity,
+use the creator cachebuster when the native package requires it, and reinstall
+only when installation is in scope. Exercise host behavior in a fresh
+conversation when host testing is requested and record that readback
+separately. For GitHub/workspace distribution, update source and verify CI
+without mutating a personal marketplace or local plugin cache.
 
 Never infer installation, enablement, publication, or live state from source
 validation or marketplace configuration alone.
